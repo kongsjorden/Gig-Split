@@ -1,0 +1,87 @@
+// Generelt
+"Cancel" = "Avbryt";
+"Save" = "Lagre";
+"OK" = "OK";
+"Edit" = "Rediger";
+"Delete" = "Slett";
+"Done" = "Ferdig";
+
+// Band
+"Bands" = "Band";
+"Add Band" = "Legg til band";
+"Members" = "Medlemmer";
+"Add Member" = "Legg til medlem";
+"Gigs" = "Spillejobber";
+"Add Gig" = "Legg til spillejobb";
+"No gigs yet" = "Ingen spillejobber ennå";
+"Name" = "Navn";
+"Mileage Compensation" = "Kjøregodtgjørelse";
+"Please fill in all required fields" = "Vennligst fyll ut alle påkrevde felt";
+"Edit Member" = "Rediger medlem";
+"No bands yet" = "Ingen band ennå";
+"Add your first band to get started" = "Legg til ditt første band for å komme i gang";
+"%d members" = "%d medlemmer";
+"%d gigs" = "%d spillejobber";
+"Member Details" = "Medlemsdetaljer";
+"Phone Number" = "Telefonnummer";
+"Email" = "E-post";
+"Payment Information" = "Betalingsinformasjon";
+"Account Number" = "Kontonummer";
+"Vipps" = "Vipps";
+"Rate per km" = "Sats per km";
+"Band Details" = "Banddetaljer";
+
+// Innstillinger
+"Settings" = "Innstillinger";
+"Defaults" = "Standardverdier";
+"Default Mileage Rate" = "Standard kjøregodtgjørelse";
+"About" = "Om";
+"Version" = "Versjon";
+
+// Tips
+"Tips" = "Tips";
+"Getting Started" = "Kom i gang";
+"Adding Gigs" = "Legge til spillejobber";
+"Managing Expenses" = "Håndtere utgifter";
+"Start by creating a band and adding its details." = "Start med å opprette et band og legge til detaljer.";
+"Add all band members who should be included in the money distribution." = "Legg til alle bandmedlemmer som skal være med i pengefordelingen.";
+"Set mileage compensation rates for members who drive to gigs." = "Sett kjøregodtgjørelse for medlemmer som kjører til spillejobber.";
+"Add new gigs with location, date, and income details." = "Legg til nye spillejobber med sted, dato og inntektsdetaljer.";
+"Record all expenses related to the gig, like PA rental or equipment." = "Registrer alle utgifter knyttet til spillejobben, som PA-leie eller utstyr.";
+"Add driving details for members who drove to the gig." = "Legg til kjøredetaljer for medlemmer som kjørte til spillejobben.";
+"Take photos of receipts to keep track of expenses." = "Ta bilder av kvitteringer for å holde oversikt over utgifter.";
+"You can edit or delete expenses at any time." = "Du kan redigere eller slette utgifter når som helst.";
+
+// Spillejobb
+"Location" = "Sted";
+"Date" = "Dato";
+"Gross Income" = "Brutto inntekt";
+"PA Rental" = "PA-leie";
+"Driving" = "Kjøring";
+"Add Driving" = "Legg til kjøring";
+"Other Expenses" = "Andre utgifter";
+"Add Expense" = "Legg til utgift";
+"Edit Gig" = "Rediger spillejobb";
+"Member" = "Medlem";
+"Select Member" = "Velg medlem";
+"Kilometers" = "Kilometer";
+"km" = "km";
+"Description" = "Beskrivelse";
+"Amount" = "Beløp";
+"Receipt" = "Kvittering";
+"Receipt (optional)" = "Kvittering (valgfritt)";
+"Receipt saved" = "Kvittering lagret";
+"Choose source" = "Velg kilde";
+"Take Photo" = "Ta bilde";
+"Choose from Library" = "Velg fra bildebibliotek";
+"Camera not available" = "Kamera ikke tilgjengelig";
+"Camera is not available on this device. Try running the app on a physical device." = "Kamera er ikke tilgjengelig på denne enheten. Prøv å kjøre appen på en fysisk enhet.";
+"Summary" = "Oppsummering";
+"Total Income" = "Total inntekt";
+"Total Expenses" = "Totale utgifter";
+"Net Income" = "Netto inntekt";
+"Per Member" = "Per medlem";
+"Driving Details" = "Kjøredetaljer";
+"Compensation" = "Godtgjørelse";
+"Total Compensation" = "Total godtgjørelse";
+"New Gig" = "Ny spillejobb";

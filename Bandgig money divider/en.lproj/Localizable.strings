@@ -1,0 +1,86 @@
+// General
+"Cancel" = "Cancel";
+"Save" = "Save";
+"OK" = "OK";
+"Edit" = "Edit";
+"Delete" = "Delete";
+"Done" = "Done";
+
+// Band
+"Bands" = "Bands";
+"Add Band" = "Add Band";
+"Members" = "Members";
+"Add Member" = "Add Member";
+"Gigs" = "Gigs";
+"Add Gig" = "Add Gig";
+"Name" = "Name";
+"Mileage Compensation" = "Mileage Compensation";
+"Please fill in all required fields" = "Please fill in all required fields";
+"Edit Member" = "Edit Member";
+"No bands yet" = "No bands yet";
+"Add your first band to get started" = "Add your first band to get started";
+"%d members" = "%d members";
+"%d gigs" = "%d gigs";
+"Member Details" = "Member Details";
+"Phone Number" = "Phone Number";
+"Email" = "Email";
+"Payment Information" = "Payment Information";
+"Account Number" = "Account Number";
+"Vipps" = "Vipps";
+"Rate per km" = "Rate per km";
+"Band Details" = "Band Details";
+
+// Settings
+"Settings" = "Settings";
+"Defaults" = "Defaults";
+"Default Mileage Rate" = "Default Mileage Rate";
+"About" = "About";
+"Version" = "Version";
+
+// Tips
+"Tips" = "Tips";
+"Getting Started" = "Getting Started";
+"Adding Gigs" = "Adding Gigs";
+"Managing Expenses" = "Managing Expenses";
+"Start by creating a band and adding its details." = "Start by creating a band and adding its details.";
+"Add all band members who should be included in the money distribution." = "Add all band members who should be included in the money distribution.";
+"Set mileage compensation rates for members who drive to gigs." = "Set mileage compensation rates for members who drive to gigs.";
+"Add new gigs with location, date, and income details." = "Add new gigs with location, date, and income details.";
+"Record all expenses related to the gig, like PA rental or equipment." = "Record all expenses related to the gig, like PA rental or equipment.";
+"Add driving details for members who drove to the gig." = "Add driving details for members who drove to the gig.";
+"Take photos of receipts to keep track of expenses." = "Take photos of receipts to keep track of expenses.";
+"You can edit or delete expenses at any time." = "You can edit or delete expenses at any time.";
+
+// Gig
+"Location" = "Location";
+"Date" = "Date";
+"Gross Income" = "Gross Income";
+"PA Rental" = "PA Rental";
+"Driving" = "Driving";
+"Add Driving" = "Add Driving";
+"Other Expenses" = "Other Expenses";
+"Add Expense" = "Add Expense";
+"Edit Gig" = "Edit Gig";
+"Member" = "Member";
+"Select Member" = "Select Member";
+"Kilometers" = "Kilometers";
+"km" = "km";
+"Description" = "Description";
+"Amount" = "Amount";
+"Receipt" = "Receipt";
+"Receipt (optional)" = "Receipt (optional)";
+"Receipt saved" = "Receipt saved";
+"Choose source" = "Choose source";
+"Take Photo" = "Take Photo";
+"Choose from Library" = "Choose from Library";
+"Camera not available" = "Camera not available";
+"Camera is not available on this device. Try running the app on a physical device." = "Camera is not available on this device. Try running the app on a physical device.";
+"Summary" = "Summary";
+"Total Income" = "Total Income";
+"Total Expenses" = "Total Expenses";
+"Net Income" = "Net Income";
+"Per Member" = "Per Member";
+"Driving Details" = "Driving Details";
+"Compensation" = "Compensation";
+"Total Compensation" = "Total Compensation";
+"New Gig" = "New Gig";
