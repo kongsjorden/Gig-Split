@@ -1,54 +1,65 @@
 import SwiftUI
 
 struct LeggTilKjøringView: View {
+    @Environment(\.dismiss) var dismiss
     let band: Band
     let onSave: (KjøringDetalj) -> Void
     
-    @Environment(\.dismiss) var dismiss
-    @State private var valgtMedlem: Medlem? = nil
-    @State private var kilometer: Double = 0.0
-    @FocusState private var focusedField: Field?
-    
-    private enum Field: Hashable {
-        case kilometer
-    }
+    @State private var valgtMedlem: Medlem?
+    @State private var kilometer = ""
     
     var body: some View {
         Form {
-            Section(header: Text(Strings.Driving.member)) {
-                Picker(Strings.Driving.selectMember, selection: $valgtMedlem) {
-                    Text(Strings.Driving.selectMember)
-                        .tag(Optional<Medlem>.none)
-                    ForEach(band.medlemmer) { medlem in
-                        Text(medlem.navn).tag(Optional(medlem))
+            Section(header: Text("KJØREINFORMASJON")) {
+                Picker("Velg medlem", selection: $valgtMedlem) {
+                    Text("Velg medlem").tag(nil as Medlem?)
+                    ForEach(band.medlemmer.filter { $0.kjøregodtgjørelse > 0 }) { medlem in
+                        Text(medlem.navn).tag(medlem as Medlem?)
+                    }
+                }
+                
+                TextField("Antall kilometer", text: $kilometer)
+                    .keyboardType(.numberPad)
+            }
+            
+            if let medlem = valgtMedlem {
+                Section(header: Text("BEREGNET BELØP")) {
+                    HStack {
+                        Text("Kjøregodtgjørelse")
+                        Spacer()
+                        Text("\(medlem.kjøregodtgjørelse, specifier: "%.2f") kr/km")
+                    }
+                    
+                    HStack {
+                        Text("Totalt beløp")
+                        Spacer()
+                        Text("\(Double(kilometer) ?? 0 * medlem.kjøregodtgjørelse, specifier: "%.2f") kr")
                     }
                 }
             }
-            
-            Section(header: Text(Strings.Driving.distance)) {
-                HStack {
-                    TextField(Strings.Driving.kilometers, value: $kilometer, format: .number)
-                        .keyboardType(.decimalPad)
-                        .focused($focusedField, equals: .kilometer)
-                        .multilineTextAlignment(.trailing)
-                    Text("km")
-                        .foregroundStyle(.secondary)
-                }
-            }
         }
-        .navigationTitle(Strings.Driving.addDriving)
-        .navigationBarItems(
-            leading: Button(Strings.Common.cancel) {
-                dismiss()
-            },
-            trailing: Button(Strings.Common.save) {
-                if let medlem = valgtMedlem {
-                    let kjøring = KjøringDetalj(medlem: medlem, kilometer: kilometer)
-                    onSave(kjøring)
+        .customNavigationTitle("Legg til kjøring")
+        .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button("Avbryt") {
                     dismiss()
                 }
             }
-            .disabled(valgtMedlem == nil || kilometer <= 0)
-        )
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Lagre") {
+                    if let medlem = valgtMedlem,
+                       let antallKm = Double(kilometer) {
+                        let kjøring = KjøringDetalj(
+                            medlem: medlem,
+                            kilometer: antallKm
+                        )
+                        onSave(kjøring)
+                        dismiss()
+                    }
+                }
+                .disabled(valgtMedlem == nil || kilometer.isEmpty)
+            }
+        }
     }
 }

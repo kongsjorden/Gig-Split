@@ -2,29 +2,35 @@ import SwiftUI
 
 struct LeggTilBandView: View {
     @Environment(\.dismiss) var dismiss
-    @State private var bandNavn = ""
-    
-    var onSave: (Band) -> Void
+    @State private var navn = ""
+    let onSave: (Band) -> Void
     
     var body: some View {
         NavigationStack {
             Form {
                 Section {
-                    TextField(Strings.Band.name, text: $bandNavn)
+                    TextField("Navn", text: $navn)
+                        .textInputAutocapitalization(.words)
+                }
+                .customSectionHeader(title: "BANDINFORMASJON", systemImage: "music.note.list")
+            }
+            .customNavigationTitle("Legg til band")
+            .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Avbryt") {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Lagre") {
+                        let nyttBand = Band(navn: navn)
+                        onSave(nyttBand)
+                        dismiss()
+                    }
+                    .disabled(navn.isEmpty)
                 }
             }
-            .navigationTitle(Strings.Band.addBand)
-            .navigationBarItems(
-                leading: Button(Strings.General.cancel) {
-                    dismiss()
-                },
-                trailing: Button(Strings.General.save) {
-                    let nyttBand = Band(navn: bandNavn)
-                    onSave(nyttBand)
-                    dismiss()
-                }
-                .disabled(bandNavn.isEmpty)
-            )
         }
     }
 }

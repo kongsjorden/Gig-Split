@@ -34,8 +34,16 @@ struct RedigerMedlemView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Personlig informasjon") {
-                    TextField(Strings.Band.name, text: $navn)
+                Section(header: Text("MEDLEMSDETALJER").customSectionTitle()) {
+                    Text("Rediger \(medlem.navn)")
+                        .gradientHeaderStyle()
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .listRowBackground(Color.clear)
+                }
+                .listRowInsets(EdgeInsets())
+                
+                Section(header: Text("PERSONLIG INFORMASJON").customSectionTitle()) {
+                    TextField("Navn", text: $navn)
                     TextField("Telefonnummer", text: $telefonnummer)
                         .keyboardType(.phonePad)
                     TextField("E-post", text: $epost)
@@ -44,14 +52,14 @@ struct RedigerMedlemView: View {
                         .autocorrectionDisabled()
                 }
                 
-                Section("Betalingsinformasjon") {
+                Section(header: Text("BETALINGSINFORMASJON").customSectionTitle()) {
                     TextField("Kontonummer", text: $kontonummer)
                         .keyboardType(.numberPad)
                     TextField("Vipps", text: $vipps)
                         .keyboardType(.phonePad)
                 }
                 
-                Section("Kjøregodtgjørelse") {
+                Section(header: Text("KJØREGODTGJØRELSE").customSectionTitle()) {
                     Toggle("Kjøring", isOn: $harKjøregodtgjørelse)
                     
                     if harKjøregodtgjørelse {
@@ -64,8 +72,7 @@ struct RedigerMedlemView: View {
                     }
                 }
             }
-            .navigationTitle(Strings.Band.editMember)
-            .navigationBarTitleDisplayMode(.inline)
+            .customNavigationTitle("Rediger medlem")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(Strings.Common.cancel) {

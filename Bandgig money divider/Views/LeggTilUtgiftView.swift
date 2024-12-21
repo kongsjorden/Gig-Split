@@ -8,7 +8,7 @@ struct LeggTilUtgiftView: View {
     
     @State private var valgtMedlem: Medlem?
     @State private var beskrivelse = ""
-    @State private var beløp: Double = 0
+    @State private var beløp = ""
     @State private var kvitteringBildeNavn: String?
     @FocusState private var focusedField: Field?
     
@@ -30,13 +30,35 @@ struct LeggTilUtgiftView: View {
     @State private var valgtBilde: PhotosPickerItem?
     
     private var kanLagre: Bool {
-        valgtMedlem != nil && !beskrivelse.isEmpty && beløp > 0
+        valgtMedlem != nil && !beskrivelse.isEmpty && !beløp.isEmpty
     }
     
     var body: some View {
         mainContent
-            .navigationTitle(Strings.Gig.addExpense)
-            .navigationBarItems(leading: avbrytKnapp, trailing: lagreKnapp)
+            .customNavigationTitle("Legg til utgift")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(Strings.Common.cancel) {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(Strings.Common.save) {
+                        if let medlem = valgtMedlem,
+                           let utgiftsbeløp = Double(beløp) {
+                            let utgift = Utgift(
+                                medlem: medlem,
+                                beskrivelse: beskrivelse,
+                                beløp: utgiftsbeløp,
+                                harKvittering: kvitteringBildeNavn != nil
+                            )
+                            onSave(utgift)
+                            dismiss()
+                        }
+                    }
+                    .disabled(!kanLagre)
+                }
+            }
             .sheet(isPresented: $visKamera) {
                 CameraView(bildeNavn: $kvitteringBildeNavn)
             }
@@ -56,28 +78,6 @@ struct LeggTilUtgiftView: View {
                 kvitteringSection
             }
         }
-    }
-    
-    private var avbrytKnapp: some View {
-        Button(Strings.Common.cancel) {
-            dismiss()
-        }
-    }
-    
-    private var lagreKnapp: some View {
-        Button(Strings.Common.save) {
-            if let medlem = valgtMedlem {
-                let utgift = Utgift(
-                    medlem: medlem,
-                    beskrivelse: beskrivelse,
-                    beløp: beløp,
-                    harKvittering: kvitteringBildeNavn != nil
-                )
-                onSave(utgift)
-                dismiss()
-            }
-        }
-        .disabled(!kanLagre)
     }
     
     private var medlemSection: some View {
@@ -105,13 +105,10 @@ struct LeggTilUtgiftView: View {
                 .focused($focusedField, equals: .beskrivelse)
             
             HStack {
-                Text(Strings.Gig.amount)
-                Spacer()
-                TextField("0", value: $beløp, formatter: numberFormatter)
+                TextField(Strings.Gig.amount, text: $beløp)
                     .focused($focusedField, equals: .beløp)
                     .keyboardType(.numberPad)
                     .multilineTextAlignment(.trailing)
-                    .frame(width: 100)
                 Text("kr")
             }
         }

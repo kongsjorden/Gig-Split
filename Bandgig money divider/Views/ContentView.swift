@@ -4,29 +4,30 @@ import Observation
 @Observable
 class BandStore {
     var bands: [Band] = []
-    var visLeggTilBand = false
+    var showingAddBand = false
     
     private let bandsKey = "savedBands"
     
-    func lagreBands() {
-        if let encodedData = try? JSONEncoder().encode(bands) {
-            UserDefaults.standard.set(encodedData, forKey: bandsKey)
-            print("Lagret \(bands.count) band")
-            for band in bands {
-                print("- \(band.navn): \(band.medlemmer.count) medlemmer")
-            }
+    init() {
+        loadBands()
+    }
+    
+    func loadBands() {
+        if let data = UserDefaults.standard.data(forKey: bandsKey),
+           let decodedBands = try? JSONDecoder().decode([Band].self, from: data) {
+            self.bands = decodedBands
         }
     }
     
-    func lastBands() {
-        if let savedData = UserDefaults.standard.data(forKey: bandsKey),
-           let decodedBands = try? JSONDecoder().decode([Band].self, from: savedData) {
-            bands = decodedBands
-            print("Lastet \(bands.count) band")
-            for band in bands {
-                print("- \(band.navn): \(band.medlemmer.count) medlemmer")
-            }
+    func saveBands() {
+        if let encoded = try? JSONEncoder().encode(bands) {
+            UserDefaults.standard.set(encoded, forKey: bandsKey)
         }
+    }
+    
+    func deleteBand(at offsets: IndexSet) {
+        bands.remove(atOffsets: offsets)
+        saveBands()
     }
 }
 
@@ -34,50 +35,54 @@ struct ContentView: View {
     @State private var bandStore = BandStore()
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             List {
-                if bandStore.bands.isEmpty {
-                    Text(Strings.Band.noBands)
-                        .foregroundStyle(.secondary)
-                        .italic()
-                } else {
-                    ForEach(bandStore.bands) { band in
-                        NavigationLink(value: band) {
-                            Text(band.navn)
-                        }
-                    }
-                    .onDelete { indexSet in
-                        bandStore.bands.remove(atOffsets: indexSet)
-                        bandStore.lagreBands()
+                ForEach(bandStore.bands) { band in
+                    NavigationLink(destination: BandDetailView(band: band)) {
+                        Text(band.navn)
+                            .font(.title3)
+                            .foregroundColor(.purple)
+                            .padding(.vertical, 5)
                     }
                 }
+                .onDelete(perform: bandStore.deleteBand)
             }
-            .navigationTitle(Strings.Band.bands)
-            .navigationDestination(for: Band.self) { band in
-                if let index = bandStore.bands.firstIndex(where: { $0.id == band.id }) {
-                    BandDetailView(band: bandStore.bands[index])
-                }
-            }
+            .customNavigationTitle("Band")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        bandStore.visLeggTilBand = true
-                    }) {
-                        Image(systemName: "plus")
+                    Button {
+                        bandStore.showingAddBand = true
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 25))
+                            .foregroundStyle(.blue)
+                            .padding(5)
                     }
                 }
             }
-            .sheet(isPresented: $bandStore.visLeggTilBand) {
-                NavigationStack {
-                    LeggTilBandView { nyttBand in
-                        bandStore.bands.append(nyttBand)
-                        bandStore.lagreBands()
+            .overlay(Group {
+                if bandStore.bands.isEmpty {
+                    VStack(spacing: 20) {
+                        Image(systemName: "music.note.list")
+                            .font(.system(size: 50))
+                            .foregroundColor(.purple)
+                        Text("Ingen band ennå")
+                            .font(.title2)
+                            .foregroundColor(.gray)
+                        Text("Trykk + for å legge til ditt første band")
+                            .foregroundColor(.gray)
                     }
                 }
+            })
+        }
+        .sheet(isPresented: $bandStore.showingAddBand) {
+            LeggTilBandView { nyttBand in
+                bandStore.bands.append(nyttBand)
+                bandStore.saveBands()
             }
         }
         .onAppear {
-            bandStore.lastBands()
+            bandStore.loadBands()
         }
     }
 }

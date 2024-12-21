@@ -40,7 +40,7 @@ struct NyttMedlemView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section(header: Text(Strings.Band.memberDetails)) {
+                Section(header: Text("MEDLEMSDETALJER").customSectionTitle()) {
                     TextField(Strings.Band.name, text: $navn)
                         .focused($focusedField, equals: .navn)
                         .textContentType(.name)
@@ -57,7 +57,7 @@ struct NyttMedlemView: View {
                         .autocapitalization(.none)
                 }
                 
-                Section(header: Text(Strings.Band.paymentInfo)) {
+                Section(header: Text("BETALINGSINFORMASJON").customSectionTitle()) {
                     TextField(Strings.Band.accountNumber, text: $kontonummer)
                         .focused($focusedField, equals: .konto)
                         .keyboardType(.numberPad)
@@ -67,7 +67,7 @@ struct NyttMedlemView: View {
                         .keyboardType(.phonePad)
                 }
                 
-                Section(header: Text(Strings.Band.mileageCompensation)) {
+                Section(header: Text("KJØREGODTGJØRELSE").customSectionTitle()) {
                     Toggle(Strings.Gig.driving, isOn: $harKjøregodtgjørelse)
                     
                     if harKjøregodtgjørelse {
@@ -84,16 +84,20 @@ struct NyttMedlemView: View {
                     }
                 }
             }
-            .navigationTitle(Strings.Band.addMember)
-            .navigationBarItems(
-                leading: Button(Strings.General.cancel) {
-                    dismiss()
-                },
-                trailing: Button(Strings.General.save) {
-                    lagreMedlem()
+            .customNavigationTitle("Nytt medlem")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(Strings.General.cancel) {
+                        dismiss()
+                    }
                 }
-                .disabled(navn.isEmpty)
-            )
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(Strings.General.save) {
+                        lagreMedlem()
+                    }
+                    .disabled(navn.isEmpty)
+                }
+            }
         }
     }
 }

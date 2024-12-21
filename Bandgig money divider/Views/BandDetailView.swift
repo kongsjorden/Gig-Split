@@ -4,102 +4,96 @@ struct BandDetailView: View {
     @Environment(\.dismiss) var dismiss
     @Bindable var band: Band
     
-    @State private var visNyttMedlem = false
-    @State private var visNySpillejobb = false
+    @State private var visLeggTilMedlem = false
+    @State private var visLeggTilSpillejobb = false
     @AppStorage("defaultKjøregodtgjørelse") private var defaultKjøregodtgjørelse = 3.5
     
-    var body: some View {
-        List {
-            Section {
-                if band.medlemmer.isEmpty {
-                    Text(Strings.Band.noMembers)
-                        .foregroundStyle(.secondary)
-                        .italic()
-                } else {
-                    ForEach(band.medlemmer.indices, id: \.self) { index in
-                        MedlemRow(medlem: $band.medlemmer[index])
-                    }
-                    .onDelete { indexSet in
-                        if let index = indexSet.first {
-                            band.fjernMedlem(at: index)
-                        }
-                    }
+    private var medlemmerSection: some View {
+        Section {
+            if band.medlemmer.isEmpty {
+                Text("Ingen medlemmer lagt til")
+                    .italic()
+                    .foregroundColor(.gray)
+            } else {
+                ForEach(Array(band.medlemmer.enumerated()), id: \.element.id) { index, medlem in
+                    MedlemRow(medlem: $band.medlemmer[index])
                 }
-            } header: {
-                HStack {
-                    Text(Strings.Band.members)
-                    Spacer()
-                    Button(action: {
-                        visNyttMedlem = true
-                    }) {
-                        Image(systemName: "plus.circle.fill")
-                    }
+                .onDelete { indexSet in
+                    band.medlemmer.remove(atOffsets: indexSet)
                 }
             }
-            
-            Section {
-                if band.spillejobber.isEmpty {
-                    Text(Strings.Band.noGigs)
-                        .foregroundStyle(.secondary)
-                        .italic()
-                } else {
-                    ForEach(band.spillejobber.indices, id: \.self) { index in
-                        NavigationLink {
-                            RedigerSpillejobbView(spillejobb: $band.spillejobber[index], band: band)
-                        } label: {
-                            SpillejobbRow(spillejobb: band.spillejobber[index])
-                        }
-                    }
-                    .onDelete { indexSet in
-                        if let index = indexSet.first {
-                            band.fjernSpillejobb(at: index)
-                        }
-                    }
-                }
-            } header: {
-                HStack {
-                    Text(Strings.Band.gigs)
-                    Spacer()
-                    Button(action: {
-                        visNySpillejobb = true
-                    }) {
-                        Image(systemName: "plus.circle.fill")
-                    }
-                }
-            }
-        }
-        .navigationTitle(band.navn)
-        .navigationBarTitleDisplayMode(.inline)
-        .sheet(isPresented: $visNyttMedlem) {
-            NavigationStack {
-                NyttMedlemView(
-                    defaultKjøregodtgjørelse: defaultKjøregodtgjørelse
-                ) { medlem in
-                    print("Legger til medlem: \(medlem.navn)")
-                    band.leggTilMedlem(medlem)
-                }
-            }
-        }
-        .sheet(isPresented: $visNySpillejobb) {
-            NavigationStack {
-                NySpillejobbView(
-                    band: band
-                ) { spillejobb in
-                    band.leggTilSpillejobb(spillejobb)
-                }
-            }
+        } header: {
+            Label("MEDLEMMER", systemImage: "person.3.fill")
+                .customSectionTitle()
         }
     }
     
-    private func binding(for spillejobb: Spillejobb) -> Binding<Spillejobb> {
-        Binding(
-            get: { spillejobb },
-            set: { newValue in
-                if let index = band.spillejobber.firstIndex(where: { $0.id == spillejobb.id }) {
-                    band.spillejobber[index] = newValue
+    private var spillejobberSection: some View {
+        Section {
+            if band.spillejobber.isEmpty {
+                Text("Ingen spillejobber lagt til")
+                    .italic()
+                    .foregroundColor(.gray)
+            } else {
+                ForEach(Array(band.spillejobber.enumerated()), id: \.element.id) { index, spillejobb in
+                    NavigationLink {
+                        RedigerSpillejobbView(spillejobb: $band.spillejobber[index], band: band)
+                    } label: {
+                        SpillejobbRow(spillejobb: band.spillejobber[index])
+                    }
+                }
+                .onDelete { indexSet in
+                    band.spillejobber.remove(atOffsets: indexSet)
                 }
             }
-        )
+        } header: {
+            Label("SPILLEJOBBER", systemImage: "music.note.list")
+                .customSectionTitle()
+        }
+    }
+    
+    var body: some View {
+        List {
+            medlemmerSection
+            spillejobberSection
+        }
+        .navigationTitle(band.navn)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    Button {
+                        visLeggTilMedlem = true
+                    } label: {
+                        Label("Legg til medlem", systemImage: "person.badge.plus")
+                    }
+                    
+                    Button {
+                        visLeggTilSpillejobb = true
+                    } label: {
+                        Label("Legg til spillejobb", systemImage: "music.note.list.badge.plus")
+                    }
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
+        }
+        .sheet(isPresented: $visLeggTilMedlem) {
+            NavigationStack {
+                NyttMedlemView(
+                    defaultKjøregodtgjørelse: defaultKjøregodtgjørelse
+                ) { nyttMedlem in
+                    band.medlemmer.append(nyttMedlem)
+                }
+            }
+        }
+        .sheet(isPresented: $visLeggTilSpillejobb) {
+            NavigationStack {
+                NySpillejobbView(band: band) { nySpillejobb in
+                    band.spillejobber.append(nySpillejobb)
+                }
+            }
+        }
     }
 }
 

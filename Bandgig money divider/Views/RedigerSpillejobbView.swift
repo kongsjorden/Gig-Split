@@ -71,12 +71,153 @@ struct RedigerSpillejobbView: View {
         dismiss()
     }
     
+    var grunnleggendeInformasjonSection: some View {
+        Section {
+            TextField("Sted", text: $sted)
+                .focused($focusedField, equals: .sted)
+            DatePicker("Dato", selection: $dato, displayedComponents: [.date])
+        } header: {
+            Text("GRUNNLEGGENDE INFORMASJON")
+                .customSectionTitle()
+        }
+    }
+    
+    var økonomiSection: some View {
+        Section {
+            HStack {
+                Text("Bruttoinntekt")
+                Spacer()
+                TextField("0", text: $bruttoInntektText)
+                    .focused($focusedField, equals: .bruttoInntekt)
+                    .keyboardType(.numberPad)
+                    .multilineTextAlignment(.trailing)
+                    .frame(width: 120)
+                    .onChange(of: bruttoInntektText) { oldValue, newValue in
+                        let number = parseNumber(newValue)
+                        bruttoInntekt = number
+                        bruttoInntektText = formatNumber(number)
+                    }
+                Text("kr")
+            }
+            
+            HStack {
+                Text("PA-leie")
+                Spacer()
+                TextField("0", text: $paLeieText)
+                    .focused($focusedField, equals: .paLeie)
+                    .keyboardType(.numberPad)
+                    .multilineTextAlignment(.trailing)
+                    .frame(width: 120)
+                    .onChange(of: paLeieText) { oldValue, newValue in
+                        let number = parseNumber(newValue)
+                        paLeie = number
+                        paLeieText = formatNumber(number)
+                    }
+                Text("kr")
+            }
+        } header: {
+            Text("ØKONOMI")
+                .customSectionTitle()
+        }
+    }
+    
+    var kjøringSection: some View {
+        Section {
+            if kjøring.isEmpty {
+                Text("Ingen kjøring lagt til")
+                    .italic()
+                    .foregroundColor(.gray)
+            } else {
+                ForEach(kjøring.indices, id: \.self) { index in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(kjøring[index].medlem.navn)
+                                .font(.headline)
+                            Text("\(kjøring[index].kilometer) km")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                        }
+                        Spacer()
+                        Text("\(kjøring[index].beløp, specifier: "%.2f") kr")
+                            .foregroundColor(.gray)
+                    }
+                }
+                .onDelete { indexSet in
+                    kjøring.remove(atOffsets: indexSet)
+                }
+            }
+            
+            Button(action: {
+                visLeggTilKjøring = true
+            }) {
+                Label("Legg til kjøring", systemImage: "car.fill")
+                    .foregroundColor(.accentColor)
+            }
+        } header: {
+            Text("KJØRING")
+                .customSectionTitle()
+        }
+    }
+    
+    var andreUtgifterSection: some View {
+        Section {
+            if andreUtgifter.isEmpty {
+                Text("Ingen utgifter registrert")
+                    .italic()
+                    .foregroundColor(.gray)
+            } else {
+                ForEach(andreUtgifter.indices, id: \.self) { index in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(andreUtgifter[index].beskrivelse)
+                                .font(.headline)
+                            Text(andreUtgifter[index].medlem.navn)
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                        }
+                        Spacer()
+                        Text("\(andreUtgifter[index].beløp, specifier: "%.2f") kr")
+                            .foregroundColor(.gray)
+                    }
+                }
+                .onDelete { indexSet in
+                    andreUtgifter.remove(atOffsets: indexSet)
+                }
+            }
+            
+            Button(action: {
+                visLeggTilUtgift = true
+            }) {
+                Label("Legg til utgift", systemImage: "plus.circle.fill")
+                    .foregroundColor(.accentColor)
+            }
+        } header: {
+            Text("ANDRE UTGIFTER")
+                .customSectionTitle()
+        }
+    }
+    
+    var fordelingSection: some View {
+        Section {
+            Button(action: {
+                visFordelOverskudd = true
+            }) {
+                Label("Fordel overskudd", systemImage: "chart.pie.fill")
+                    .foregroundColor(.accentColor)
+            }
+        } header: {
+            Text("FORDELING")
+                .customSectionTitle()
+        }
+    }
+    
     var body: some View {
         Form {
-            basicInfoSection
-            economySection
+            grunnleggendeInformasjonSection
+            økonomiSection
             kjøringSection
             andreUtgifterSection
+            fordelingSection
             
             Section {
                 VStack(alignment: .leading, spacing: 10) {
@@ -92,40 +233,28 @@ struct RedigerSpillejobbView: View {
                         Text("\(Int(spillejobb.overskudd)) kr")
                             .foregroundColor(spillejobb.overskudd >= 0 ? .green : .red)
                     }
-                    
-                    Button(action: {
-                        visFordelOverskudd = true
-                    }) {
-                        Text("Fordel overskudd")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(band.medlemmer.isEmpty)
                 }
             }
         }
-        .navigationTitle(Strings.Gig.editGig)
-        .navigationBarItems(
-            leading: Button(Strings.General.cancel) {
-                dismiss()
-            },
-            trailing: Button(Strings.General.save) {
-                lagreEndringer()
+        .customNavigationTitle("Rediger spillejobb")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Ferdig") {
+                    lagreEndringer()
+                }
             }
-            .disabled(sted.isEmpty)
-        )
+        }
         .sheet(isPresented: $visLeggTilKjøring) {
             NavigationStack {
-                LeggTilKjøringView(band: band, onSave: { nyKjøring in
+                LeggTilKjøringView(band: band) { nyKjøring in
                     kjøring.append(nyKjøring)
-                })
+                }
             }
         }
         .sheet(isPresented: $visLeggTilUtgift) {
             NavigationStack {
                 LeggTilUtgiftView(band: band) { utgift in
                     andreUtgifter.append(utgift)
-                    spillejobb.andreUtgifter = andreUtgifter
                 }
             }
         }
@@ -142,120 +271,6 @@ struct RedigerSpillejobbView: View {
                         focusedField = nil
                     }
                 }
-            }
-        }
-    }
-    
-    private var basicInfoSection: some View {
-        Section(header: Text(Strings.Gig.basicInfo)) {
-            TextField(Strings.Gig.venue, text: $sted)
-                .focused($focusedField, equals: .sted)
-            DatePicker(Strings.Gig.date, selection: $dato, displayedComponents: [.date])
-        }
-    }
-    
-    private var economySection: some View {
-        Section(header: Text(Strings.Gig.economy)) {
-            HStack {
-                Text(Strings.Gig.grossIncome)
-                Spacer()
-                TextField("0", text: $bruttoInntektText)
-                    .focused($focusedField, equals: .bruttoInntekt)
-                    .keyboardType(.numberPad)
-                    .multilineTextAlignment(.trailing)
-                    .frame(width: 120)
-                    .onChange(of: bruttoInntektText) { oldValue, newValue in
-                        let number = parseNumber(newValue)
-                        bruttoInntekt = number
-                        bruttoInntektText = formatNumber(number)
-                    }
-                Text("kr")
-            }
-            
-            HStack {
-                Text(Strings.Gig.paRental)
-                Spacer()
-                TextField("0", text: $paLeieText)
-                    .focused($focusedField, equals: .paLeie)
-                    .keyboardType(.numberPad)
-                    .multilineTextAlignment(.trailing)
-                    .frame(width: 120)
-                    .onChange(of: paLeieText) { oldValue, newValue in
-                        let number = parseNumber(newValue)
-                        paLeie = number
-                        paLeieText = formatNumber(number)
-                    }
-                Text("kr")
-            }
-        }
-    }
-    
-    private var kjøringSection: some View {
-        Section(header: Text(Strings.Gig.driving)) {
-            if kjøring.isEmpty {
-                Text(Strings.Gig.noDriving)
-                    .foregroundStyle(.secondary)
-                    .italic()
-            } else {
-                ForEach(kjøring.indices, id: \.self) { index in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(kjøring[index].medlem.navn)
-                                .font(.headline)
-                            Text("\(kjøring[index].kilometer) km")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        Text("\(kjøring[index].beløp, specifier: "%.2f") kr")
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .onDelete { indexSet in
-                    kjøring.remove(atOffsets: indexSet)
-                }
-            }
-            
-            Button(action: {
-                visLeggTilKjøring = true
-            }) {
-                Label(Strings.Gig.addDriving, systemImage: "car.fill")
-                    .foregroundColor(.accentColor)
-            }
-        }
-    }
-    
-    private var andreUtgifterSection: some View {
-        Section(header: Text(Strings.Gig.otherExpenses)) {
-            if andreUtgifter.isEmpty {
-                Text(Strings.Gig.noExpenses)
-                    .foregroundStyle(.secondary)
-                    .italic()
-            } else {
-                ForEach(andreUtgifter.indices, id: \.self) { index in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(andreUtgifter[index].beskrivelse)
-                                .font(.headline)
-                            Text(andreUtgifter[index].medlem.navn)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        Text("\(andreUtgifter[index].beløp, specifier: "%.2f") kr")
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .onDelete { indexSet in
-                    andreUtgifter.remove(atOffsets: indexSet)
-                }
-            }
-            
-            Button(action: {
-                visLeggTilUtgift = true
-            }) {
-                Label(Strings.Gig.addExpense, systemImage: "plus.circle.fill")
-                    .foregroundColor(.accentColor)
             }
         }
     }

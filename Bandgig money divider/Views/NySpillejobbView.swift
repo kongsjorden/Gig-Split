@@ -41,16 +41,19 @@ struct NySpillejobbView: View {
         return Double(cleanedText) ?? 0
     }
     
-    private var basicInfoSection: some View {
-        Section(header: Text(Strings.Gig.basicInfo)) {
+    private var grunnleggendeInformasjonSection: some View {
+        Section {
             TextField(Strings.Gig.venue, text: $sted)
                 .focused($focusedField, equals: .sted)
             DatePicker(Strings.Gig.date, selection: $dato, displayedComponents: [.date])
+        } header: {
+            Text("GRUNNLEGGENDE INFORMASJON")
+                .customSectionTitle()
         }
     }
     
-    private var economySection: some View {
-        Section(header: Text(Strings.Gig.economy)) {
+    private var økonomiSection: some View {
+        Section {
             HStack {
                 Text(Strings.Gig.grossIncome)
                 Spacer()
@@ -82,11 +85,14 @@ struct NySpillejobbView: View {
                     }
                 Text("kr")
             }
+        } header: {
+            Text("ØKONOMI")
+                .customSectionTitle()
         }
     }
     
     private var kjøringSection: some View {
-        Section(header: Text(Strings.Gig.driving)) {
+        Section {
             if kjøring.isEmpty {
                 Text(Strings.Gig.noDriving)
                     .foregroundStyle(.secondary)
@@ -105,26 +111,14 @@ struct NySpillejobbView: View {
             }) {
                 Label(Strings.Gig.addDriving, systemImage: "car")
             }
-        }
-    }
-    
-    private func kjøringRow(for kjøring: KjøringDetalj) -> some View {
-        HStack {
-            VStack(alignment: .leading) {
-                Text(kjøring.medlem.navn)
-                    .font(.headline)
-                Text("\(kjøring.kilometer) km")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer()
-            Text("\(kjøring.beløp, specifier: "%.2f") kr")
-                .foregroundStyle(.secondary)
+        } header: {
+            Text("KJØRING")
+                .customSectionTitle()
         }
     }
     
     private var andreUtgifterSection: some View {
-        Section(header: Text(Strings.Gig.otherExpenses)) {
+        Section {
             if andreUtgifter.isEmpty {
                 Text(Strings.Gig.noExpenses)
                     .foregroundStyle(.secondary)
@@ -143,6 +137,24 @@ struct NySpillejobbView: View {
             }) {
                 Label(Strings.Gig.addExpense, systemImage: "plus.circle")
             }
+        } header: {
+            Text("ANDRE UTGIFTER")
+                .customSectionTitle()
+        }
+    }
+    
+    private func kjøringRow(for kjøring: KjøringDetalj) -> some View {
+        HStack {
+            VStack(alignment: .leading) {
+                Text(kjøring.medlem.navn)
+                    .font(.headline)
+                Text("\(kjøring.kilometer) km")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            Text("\(kjøring.beløp, specifier: "%.2f") kr")
+                .foregroundStyle(.secondary)
         }
     }
     
@@ -163,30 +175,34 @@ struct NySpillejobbView: View {
     
     var body: some View {
         Form {
-            basicInfoSection
-            economySection
+            grunnleggendeInformasjonSection
+            økonomiSection
             kjøringSection
             andreUtgifterSection
         }
-        .navigationTitle(Strings.Gig.newGig)
-        .navigationBarItems(
-            leading: Button(Strings.Common.cancel) {
-                dismiss()
-            },
-            trailing: Button(Strings.Common.save) {
-                let spillejobb = Spillejobb(
-                    sted: sted,
-                    dato: dato,
-                    bruttoInntekt: bruttoInntekt,
-                    paLeie: paLeie,
-                    kjøring: kjøring,
-                    andreUtgifter: andreUtgifter
-                )
-                onSave(spillejobb)
-                dismiss()
+        .customNavigationTitle("Ny spillejobb")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(Strings.Common.cancel) {
+                    dismiss()
+                }
             }
-            .disabled(sted.isEmpty)
-        )
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(Strings.Common.save) {
+                    let spillejobb = Spillejobb(
+                        sted: sted,
+                        dato: dato,
+                        bruttoInntekt: bruttoInntekt,
+                        paLeie: paLeie,
+                        kjøring: kjøring,
+                        andreUtgifter: andreUtgifter
+                    )
+                    onSave(spillejobb)
+                    dismiss()
+                }
+                .disabled(sted.isEmpty)
+            }
+        }
         .sheet(isPresented: $visLeggTilKjøring) {
             NavigationStack {
                 LeggTilKjøringView(
