@@ -13,6 +13,7 @@ struct RedigerSpillejobbView: View {
     @State private var andreUtgifter: [Utgift]
     @State private var visLeggTilKjøring = false
     @State private var visLeggTilUtgift = false
+    @State private var visFordelOverskudd = false
     @FocusState private var focusedField: Field?
     
     private enum Field {
@@ -35,6 +36,9 @@ struct RedigerSpillejobbView: View {
         formatter.numberStyle = .decimal
         formatter.minimumFractionDigits = 0
         formatter.maximumFractionDigits = 0
+        formatter.groupingSeparator = " "
+        formatter.groupingSize = 3
+        formatter.usesGroupingSeparator = true
         return formatter
     }()
     
@@ -60,6 +64,32 @@ struct RedigerSpillejobbView: View {
             economySection
             kjøringSection
             andreUtgifterSection
+            
+            Section {
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack {
+                        Text("Totale utgifter")
+                        Spacer()
+                        Text("\(Int(spillejobb.totaleUtgifter)) kr")
+                    }
+                    
+                    HStack {
+                        Text("Overskudd")
+                        Spacer()
+                        Text("\(Int(spillejobb.overskudd)) kr")
+                            .foregroundColor(spillejobb.overskudd >= 0 ? .green : .red)
+                    }
+                    
+                    Button(action: {
+                        visFordelOverskudd = true
+                    }) {
+                        Text("Fordel overskudd")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(band.medlemmer.isEmpty)
+                }
+            }
         }
         .navigationTitle(Strings.Gig.editGig)
         .navigationBarItems(
@@ -85,6 +115,11 @@ struct RedigerSpillejobbView: View {
                 }
             }
         }
+        .sheet(isPresented: $visFordelOverskudd) {
+            NavigationStack {
+                FordelOverskuddView(spillejobb: spillejobb, band: band)
+            }
+        }
         .toolbar {
             if focusedField != nil {
                 ToolbarItemGroup(placement: .keyboard) {
@@ -107,26 +142,26 @@ struct RedigerSpillejobbView: View {
     
     private var economySection: some View {
         Section(header: Text(Strings.Gig.economy)) {
-            VStack(alignment: .leading) {
+            HStack {
                 Text(Strings.Gig.grossIncome)
-                HStack {
-                    TextField("0", value: $bruttoInntekt, formatter: numberFormatter)
-                        .focused($focusedField, equals: .bruttoInntekt)
-                        .keyboardType(.numberPad)
-                        .multilineTextAlignment(.trailing)
-                    Text("kr")
-                }
+                Spacer()
+                TextField("0", value: $bruttoInntekt, formatter: numberFormatter)
+                    .focused($focusedField, equals: .bruttoInntekt)
+                    .keyboardType(.numberPad)
+                    .multilineTextAlignment(.trailing)
+                    .frame(width: 120)
+                Text("kr")
             }
             
-            VStack(alignment: .leading) {
+            HStack {
                 Text(Strings.Gig.paRental)
-                HStack {
-                    TextField("0", value: $paLeie, formatter: numberFormatter)
-                        .focused($focusedField, equals: .paLeie)
-                        .keyboardType(.numberPad)
-                        .multilineTextAlignment(.trailing)
-                    Text("kr")
-                }
+                Spacer()
+                TextField("0", value: $paLeie, formatter: numberFormatter)
+                    .focused($focusedField, equals: .paLeie)
+                    .keyboardType(.numberPad)
+                    .multilineTextAlignment(.trailing)
+                    .frame(width: 120)
+                Text("kr")
             }
         }
     }

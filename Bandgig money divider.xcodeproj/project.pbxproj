@@ -29,9 +29,22 @@
 		270371CB2D06CDDB004A98BD /* Bandgig money dividerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Bandgig money dividerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		2759E9FA2D171E55002B09B4 /* Exceptions for "Bandgig money divider" folder in "Bandgig money divider" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 270371B02D06CDDA004A98BD /* Bandgig money divider */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		270371B32D06CDDA004A98BD /* Bandgig money divider */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				2759E9FA2D171E55002B09B4 /* Exceptions for "Bandgig money divider" folder in "Bandgig money divider" target */,
+			);
 			path = "Bandgig money divider";
 			sourceTree = "<group>";
 		};
@@ -397,11 +410,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"Bandgig money divider/Preview Content\"";
 				DEVELOPMENT_TEAM = 93RPWU4V26;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Bandgig money divider/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Gig Split";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Vi trenger tilgang til kameraet for å ta bilder av kvitteringer";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Vi trenger tilgang til å lagre bilder i bildegalleriet";
@@ -413,7 +427,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "kongsjorden-studio.Bandgig-money-divider";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -428,11 +442,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"Bandgig money divider/Preview Content\"";
 				DEVELOPMENT_TEAM = 93RPWU4V26;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Bandgig money divider/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Gig Split";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Vi trenger tilgang til kameraet for å ta bilder av kvitteringer";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Vi trenger tilgang til å lagre bilder i bildegalleriet";
@@ -444,7 +459,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "kongsjorden-studio.Bandgig-money-divider";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
