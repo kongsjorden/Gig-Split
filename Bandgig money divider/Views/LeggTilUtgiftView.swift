@@ -34,30 +34,18 @@ struct LeggTilUtgiftView: View {
     }
     
     var body: some View {
-        NavigationView {
-            mainContent
-                .navigationTitle(Strings.Gig.addExpense)
-                .navigationBarItems(leading: avbrytKnapp, trailing: lagreKnapp)
-        }
-        .sheet(isPresented: $visKamera) {
-            CameraView(bildeNavn: $kvitteringBildeNavn)
-        }
-        .alert(Strings.Gig.cameraNotAvailable, isPresented: $visKameraIkkeTilgjengeligAlert) {
-            Button(Strings.Common.ok, role: .cancel) { }
-        }
-        .onChange(of: valgtBilde) { _, newValue in
-            handleValgtBildeEndring()
-        }
-        .toolbar {
-            if focusedField != nil {
-                ToolbarItemGroup(placement: .keyboard) {
-                    Spacer()
-                    Button(Strings.Common.done) {
-                        focusedField = nil
-                    }
-                }
+        mainContent
+            .navigationTitle(Strings.Gig.addExpense)
+            .navigationBarItems(leading: avbrytKnapp, trailing: lagreKnapp)
+            .sheet(isPresented: $visKamera) {
+                CameraView(bildeNavn: $kvitteringBildeNavn)
             }
-        }
+            .alert(Strings.Gig.cameraNotAvailable, isPresented: $visKameraIkkeTilgjengeligAlert) {
+                Button(Strings.Common.ok, role: .cancel) { }
+            }
+            .onChange(of: valgtBilde) { _, newValue in
+                handleValgtBildeEndring()
+            }
     }
     
     private var mainContent: some View {

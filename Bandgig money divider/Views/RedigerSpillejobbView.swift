@@ -7,7 +7,9 @@ struct RedigerSpillejobbView: View {
     
     @State private var sted: String
     @State private var dato: Date
+    @State private var bruttoInntektText: String
     @State private var bruttoInntekt: Double
+    @State private var paLeieText: String
     @State private var paLeie: Double
     @State private var kjøring: [KjøringDetalj]
     @State private var andreUtgifter: [Utgift]
@@ -25,7 +27,9 @@ struct RedigerSpillejobbView: View {
         self.band = band
         self._sted = State(initialValue: spillejobb.wrappedValue.sted)
         self._dato = State(initialValue: spillejobb.wrappedValue.dato)
+        self._bruttoInntektText = State(initialValue: String(format: "%.0f", spillejobb.wrappedValue.bruttoInntekt))
         self._bruttoInntekt = State(initialValue: spillejobb.wrappedValue.bruttoInntekt)
+        self._paLeieText = State(initialValue: String(format: "%.0f", spillejobb.wrappedValue.paLeie))
         self._paLeie = State(initialValue: spillejobb.wrappedValue.paLeie)
         self._kjøring = State(initialValue: spillejobb.wrappedValue.kjøring)
         self._andreUtgifter = State(initialValue: spillejobb.wrappedValue.andreUtgifter)
@@ -41,6 +45,15 @@ struct RedigerSpillejobbView: View {
         formatter.usesGroupingSeparator = true
         return formatter
     }()
+
+    private func formatNumber(_ number: Double) -> String {
+        return numberFormatter.string(from: NSNumber(value: number)) ?? "0"
+    }
+
+    private func parseNumber(_ text: String) -> Double {
+        let cleanedText = text.replacingOccurrences(of: " ", with: "")
+        return Double(cleanedText) ?? 0
+    }
     
     private func lagreEndringer() {
         spillejobb.sted = sted
@@ -112,6 +125,7 @@ struct RedigerSpillejobbView: View {
             NavigationStack {
                 LeggTilUtgiftView(band: band) { utgift in
                     andreUtgifter.append(utgift)
+                    spillejobb.andreUtgifter = andreUtgifter
                 }
             }
         }
@@ -145,22 +159,32 @@ struct RedigerSpillejobbView: View {
             HStack {
                 Text(Strings.Gig.grossIncome)
                 Spacer()
-                TextField("0", value: $bruttoInntekt, formatter: numberFormatter)
+                TextField("0", text: $bruttoInntektText)
                     .focused($focusedField, equals: .bruttoInntekt)
                     .keyboardType(.numberPad)
                     .multilineTextAlignment(.trailing)
                     .frame(width: 120)
+                    .onChange(of: bruttoInntektText) { oldValue, newValue in
+                        let number = parseNumber(newValue)
+                        bruttoInntekt = number
+                        bruttoInntektText = formatNumber(number)
+                    }
                 Text("kr")
             }
             
             HStack {
                 Text(Strings.Gig.paRental)
                 Spacer()
-                TextField("0", value: $paLeie, formatter: numberFormatter)
+                TextField("0", text: $paLeieText)
                     .focused($focusedField, equals: .paLeie)
                     .keyboardType(.numberPad)
                     .multilineTextAlignment(.trailing)
                     .frame(width: 120)
+                    .onChange(of: paLeieText) { oldValue, newValue in
+                        let number = parseNumber(newValue)
+                        paLeie = number
+                        paLeieText = formatNumber(number)
+                    }
                 Text("kr")
             }
         }

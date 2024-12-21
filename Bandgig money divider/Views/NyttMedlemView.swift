@@ -94,14 +94,6 @@ struct NyttMedlemView: View {
                 }
                 .disabled(navn.isEmpty)
             )
-            .toolbar {
-                ToolbarItemGroup(placement: .keyboard) {
-                    Spacer()
-                    Button("Ferdig") {
-                        focusedField = nil
-                    }
-                }
-            }
         }
     }
 }

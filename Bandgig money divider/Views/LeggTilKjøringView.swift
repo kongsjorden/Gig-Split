@@ -26,9 +26,14 @@ struct LeggTilKjøringView: View {
             }
             
             Section(header: Text(Strings.Driving.distance)) {
-                TextField(Strings.Driving.kilometers, value: $kilometer, format: .number)
-                    .keyboardType(.decimalPad)
-                    .focused($focusedField, equals: .kilometer)
+                HStack {
+                    TextField(Strings.Driving.kilometers, value: $kilometer, format: .number)
+                        .keyboardType(.decimalPad)
+                        .focused($focusedField, equals: .kilometer)
+                        .multilineTextAlignment(.trailing)
+                    Text("km")
+                        .foregroundStyle(.secondary)
+                }
             }
         }
         .navigationTitle(Strings.Driving.addDriving)
@@ -45,15 +50,5 @@ struct LeggTilKjøringView: View {
             }
             .disabled(valgtMedlem == nil || kilometer <= 0)
         )
-        .toolbar {
-            if focusedField != nil {
-                ToolbarItemGroup(placement: .keyboard) {
-                    Spacer()
-                    Button(Strings.Common.done) {
-                        focusedField = nil
-                    }
-                }
-            }
-        }
     }
 }

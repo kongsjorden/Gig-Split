@@ -13,6 +13,7 @@ struct FordelOverskuddView: View {
                 Text("Bruttoinntekt")
                 Spacer()
                 Text("\(Int(spillejobb.bruttoInntekt)) kr")
+                    .foregroundStyle(.blue)
             }
             
             // Utgifter
@@ -24,22 +25,69 @@ struct FordelOverskuddView: View {
                 HStack {
                     Text("PA-leie")
                     Spacer()
-                    Text("\(Int(spillejobb.paLeie)) kr")
+                    Text("-\(Int(spillejobb.paLeie)) kr")
+                        .foregroundStyle(.red)
                 }
                 
                 if !spillejobb.kjøring.isEmpty {
+                    Text("Kjøring")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .padding(.top, 5)
+                    
+                    ForEach(spillejobb.kjøring) { kjøring in
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(kjøring.medlem.navn)
+                                Text("\(kjøring.kilometer) km")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Text("-\(Int(kjøring.beløp)) kr")
+                                .foregroundStyle(.red)
+                        }
+                        .padding(.leading)
+                    }
+                    
                     HStack {
-                        Text("Kjøring")
+                        Text("Sum kjøring")
+                            .fontWeight(.medium)
                         Spacer()
-                        Text("\(Int(spillejobb.kjøringTotalt)) kr")
+                        Text("-\(Int(spillejobb.kjøringTotalt)) kr")
+                            .fontWeight(.medium)
+                            .foregroundStyle(.red)
                     }
                 }
                 
                 if !spillejobb.andreUtgifter.isEmpty {
+                    Text("Andre utgifter")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .padding(.top, 5)
+                    
+                    ForEach(spillejobb.andreUtgifter) { utgift in
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(utgift.beskrivelse)
+                                Text(utgift.medlem.navn)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Text("-\(Int(utgift.beløp)) kr")
+                                .foregroundStyle(.red)
+                        }
+                        .padding(.leading)
+                    }
+                    
                     HStack {
-                        Text("Andre utgifter")
+                        Text("Sum andre utgifter")
+                            .fontWeight(.medium)
                         Spacer()
-                        Text("\(Int(spillejobb.andreUtgifterTotalt)) kr")
+                        Text("-\(Int(spillejobb.andreUtgifterTotalt)) kr")
+                            .fontWeight(.medium)
+                            .foregroundStyle(.red)
                     }
                 }
                 
@@ -47,8 +95,9 @@ struct FordelOverskuddView: View {
                     Text("Totale utgifter")
                         .fontWeight(.bold)
                     Spacer()
-                    Text("\(Int(spillejobb.totaleUtgifter)) kr")
+                    Text("-\(Int(spillejobb.totaleUtgifter)) kr")
                         .fontWeight(.bold)
+                        .foregroundStyle(.red)
                 }
             }
             
@@ -59,7 +108,7 @@ struct FordelOverskuddView: View {
                 Spacer()
                 Text("\(Int(spillejobb.overskudd)) kr")
                     .fontWeight(.bold)
-                    .foregroundColor(spillejobb.overskudd >= 0 ? .green : .red)
+                    .foregroundStyle(spillejobb.overskudd >= 0 ? .green : .red)
             }
             .padding(.top)
             
@@ -74,13 +123,20 @@ struct FordelOverskuddView: View {
                     Text(fordelt.medlem.navn)
                     Spacer()
                     Text("\(Int(fordelt.beløp)) kr")
-                        .foregroundColor(fordelt.beløp >= 0 ? .green : .red)
+                        .foregroundStyle(fordelt.beløp >= 0 ? .green : .red)
                 }
             }
         }
         .navigationTitle("Fordeling av overskudd")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    dismiss()
+                }) {
+                    Text(Strings.Common.done)
+                }
+            }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
                     visDetaljer.toggle()

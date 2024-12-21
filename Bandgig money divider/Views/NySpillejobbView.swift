@@ -7,7 +7,9 @@ struct NySpillejobbView: View {
     
     @State private var sted = ""
     @State private var dato = Date()
+    @State private var bruttoInntektText = ""
     @State private var bruttoInntekt: Double = 0
+    @State private var paLeieText = ""
     @State private var paLeie: Double = 0
     @State private var kjøring: [KjøringDetalj] = []
     @State private var andreUtgifter: [Utgift] = []
@@ -24,65 +26,19 @@ struct NySpillejobbView: View {
         formatter.numberStyle = .decimal
         formatter.minimumFractionDigits = 0
         formatter.maximumFractionDigits = 0
+        formatter.groupingSeparator = " "
+        formatter.groupingSize = 3
+        formatter.usesGroupingSeparator = true
         return formatter
     }()
-    
-    var body: some View {
-        Form {
-            basicInfoSection
-            economySection
-            kjøringSection
-            andreUtgifterSection
-        }
-        .navigationTitle(Strings.Gig.newGig)
-        .navigationBarItems(
-            leading: Button(Strings.Common.cancel) {
-                dismiss()
-            },
-            trailing: Button(Strings.Common.save) {
-                let spillejobb = Spillejobb(
-                    sted: sted,
-                    dato: dato,
-                    bruttoInntekt: bruttoInntekt,
-                    paLeie: paLeie,
-                    kjøring: kjøring,
-                    andreUtgifter: andreUtgifter
-                )
-                onSave(spillejobb)
-                dismiss()
-            }
-            .disabled(sted.isEmpty)
-        )
-        .sheet(isPresented: $visLeggTilKjøring) {
-            NavigationStack {
-                LeggTilKjøringView(
-                    band: band,
-                    onSave: { nyKjøring in
-                        kjøring.append(nyKjøring)
-                    }
-                )
-            }
-        }
-        .sheet(isPresented: $visLeggTilUtgift) {
-            NavigationStack {
-                LeggTilUtgiftView(
-                    band: band,
-                    onSave: { nyUtgift in
-                        andreUtgifter.append(nyUtgift)
-                    }
-                )
-            }
-        }
-        .toolbar {
-            if focusedField != nil {
-                ToolbarItemGroup(placement: .keyboard) {
-                    Spacer()
-                    Button(Strings.Common.done) {
-                        focusedField = nil
-                    }
-                }
-            }
-        }
+
+    private func formatNumber(_ number: Double) -> String {
+        return numberFormatter.string(from: NSNumber(value: number)) ?? "0"
+    }
+
+    private func parseNumber(_ text: String) -> Double {
+        let cleanedText = text.replacingOccurrences(of: " ", with: "")
+        return Double(cleanedText) ?? 0
     }
     
     private var basicInfoSection: some View {
@@ -98,22 +54,32 @@ struct NySpillejobbView: View {
             HStack {
                 Text(Strings.Gig.grossIncome)
                 Spacer()
-                TextField("0", value: $bruttoInntekt, formatter: numberFormatter)
+                TextField("0", text: $bruttoInntektText)
                     .focused($focusedField, equals: .bruttoInntekt)
                     .keyboardType(.numberPad)
                     .multilineTextAlignment(.trailing)
                     .frame(width: 100)
+                    .onChange(of: bruttoInntektText) { oldValue, newValue in
+                        let number = parseNumber(newValue)
+                        bruttoInntekt = number
+                        bruttoInntektText = formatNumber(number)
+                    }
                 Text("kr")
             }
             
             HStack {
                 Text(Strings.Gig.paRental)
                 Spacer()
-                TextField("0", value: $paLeie, formatter: numberFormatter)
+                TextField("0", text: $paLeieText)
                     .focused($focusedField, equals: .paLeie)
                     .keyboardType(.numberPad)
                     .multilineTextAlignment(.trailing)
                     .frame(width: 100)
+                    .onChange(of: paLeieText) { oldValue, newValue in
+                        let number = parseNumber(newValue)
+                        paLeie = number
+                        paLeieText = formatNumber(number)
+                    }
                 Text("kr")
             }
         }
@@ -192,6 +158,54 @@ struct NySpillejobbView: View {
             Spacer()
             Text("\(utgift.beløp, specifier: "%.2f") kr")
                 .foregroundStyle(.secondary)
+        }
+    }
+    
+    var body: some View {
+        Form {
+            basicInfoSection
+            economySection
+            kjøringSection
+            andreUtgifterSection
+        }
+        .navigationTitle(Strings.Gig.newGig)
+        .navigationBarItems(
+            leading: Button(Strings.Common.cancel) {
+                dismiss()
+            },
+            trailing: Button(Strings.Common.save) {
+                let spillejobb = Spillejobb(
+                    sted: sted,
+                    dato: dato,
+                    bruttoInntekt: bruttoInntekt,
+                    paLeie: paLeie,
+                    kjøring: kjøring,
+                    andreUtgifter: andreUtgifter
+                )
+                onSave(spillejobb)
+                dismiss()
+            }
+            .disabled(sted.isEmpty)
+        )
+        .sheet(isPresented: $visLeggTilKjøring) {
+            NavigationStack {
+                LeggTilKjøringView(
+                    band: band,
+                    onSave: { nyKjøring in
+                        kjøring.append(nyKjøring)
+                    }
+                )
+            }
+        }
+        .sheet(isPresented: $visLeggTilUtgift) {
+            NavigationStack {
+                LeggTilUtgiftView(
+                    band: band,
+                    onSave: { nyUtgift in
+                        andreUtgifter.append(nyUtgift)
+                    }
+                )
+            }
         }
     }
 }

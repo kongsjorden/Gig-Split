@@ -16,8 +16,8 @@ struct BandDetailView: View {
                         .foregroundStyle(.secondary)
                         .italic()
                 } else {
-                    ForEach(band.medlemmer) { medlem in
-                        MedlemRow(medlem: medlem)
+                    ForEach(band.medlemmer.indices, id: \.self) { index in
+                        MedlemRow(medlem: $band.medlemmer[index])
                     }
                     .onDelete { indexSet in
                         if let index = indexSet.first {
@@ -103,38 +103,15 @@ struct BandDetailView: View {
     }
 }
 
-struct MedlemRow: View {
-    let medlem: Medlem
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text(medlem.navn)
-                .font(.headline)
-            if medlem.kjøregodtgjørelse > 0 {
-                Text("\(medlem.kjøregodtgjørelse, specifier: "%.2f") kr/km")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-        }
-    }
-}
-
 struct SpillejobbRow: View {
     let spillejobb: Spillejobb
     
     var body: some View {
         VStack(alignment: .leading) {
             Text(spillejobb.sted)
-                .font(.headline)
-            HStack {
-                Text(spillejobb.dato.formatted(date: .abbreviated, time: .omitted))
-                if spillejobb.bruttoInntekt > 0 {
-                    Text("•")
-                    Text("\(spillejobb.bruttoInntekt, specifier: "%.0f") kr")
-                }
-            }
-            .font(.subheadline)
-            .foregroundStyle(.secondary)
+            Text(spillejobb.dato.formatted(date: .long, time: .omitted))
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
     }
 }
