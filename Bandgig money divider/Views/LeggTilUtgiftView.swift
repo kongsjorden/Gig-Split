@@ -175,14 +175,24 @@ struct LeggTilUtgiftView: View {
     
     private func handleValgtBildeEndring() {
         Task {
-            if let valgtBilde = valgtBilde,
-               let data = try? await valgtBilde.loadTransferable(type: Data.self) {
-                let bildeNavn = UUID().uuidString + ".jpg"
-                let url = getDocumentsDirectory().appendingPathComponent(bildeNavn)
-                try? data.write(to: url)
-                await MainActor.run {
-                    self.kvitteringBildeNavn = bildeNavn
+            do {
+                if let valgtBilde = valgtBilde,
+                   let data = try await valgtBilde.loadTransferable(type: Data.self) {
+                    let bildeNavn = UUID().uuidString + ".jpg"
+                    let url = getDocumentsDirectory().appendingPathComponent(bildeNavn)
+                    try data.write(to: url)
+                    
+                    // Verifiser at bildet ble lagret
+                    if FileManager.default.fileExists(atPath: url.path()) {
+                        await MainActor.run {
+                            self.kvitteringBildeNavn = bildeNavn
+                            self.valgtBilde = nil  // Nullstill valgt bilde
+                        }
+                    }
                 }
+            } catch {
+                print("Feil ved lagring av bilde: \(error)")
+                // TODO: Vis feilmelding til bruker
             }
         }
     }
@@ -222,13 +232,22 @@ struct CameraView: UIViewControllerRepresentable {
         
         func imagePickerController(_ picker: UIImagePickerController,
                                  didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-            if let bilde = info[.originalImage] as? UIImage,
-               let data = bilde.jpegData(compressionQuality: 0.8) {
-                let bildeNavn = UUID().uuidString + ".jpg"
-                let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-                    .appendingPathComponent(bildeNavn)
-                try? data.write(to: url)
-                parent.bildeNavn = bildeNavn
+            if let bilde = info[.originalImage] as? UIImage {
+                // Komprimer bildet med bedre kvalitet
+                if let data = bilde.jpegData(compressionQuality: 0.9) {
+                    let bildeNavn = UUID().uuidString + ".jpg"
+                    let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+                        .appendingPathComponent(bildeNavn)
+                    do {
+                        try data.write(to: url)
+                        if FileManager.default.fileExists(atPath: url.path()) {
+                            parent.bildeNavn = bildeNavn
+                        }
+                    } catch {
+                        print("Feil ved lagring av kamerabilde: \(error)")
+                        // TODO: Vis feilmelding til bruker
+                    }
+                }
             }
             
             parent.presentationMode.wrappedValue.dismiss()
