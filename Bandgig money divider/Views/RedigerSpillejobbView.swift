@@ -56,16 +56,20 @@ struct RedigerSpillejobbView: View {
     }
     
     private func lagreEndringer() {
-        spillejobb.sted = sted
-        spillejobb.dato = dato
-        spillejobb.bruttoInntekt = bruttoInntekt
-        spillejobb.paLeie = paLeie
-        spillejobb.kjøring = kjøring
-        spillejobb.andreUtgifter = andreUtgifter
+        var oppdatertSpillejobb = spillejobb
+        oppdatertSpillejobb.sted = sted
+        oppdatertSpillejobb.dato = dato
+        oppdatertSpillejobb.bruttoInntekt = bruttoInntekt
+        oppdatertSpillejobb.paLeie = paLeie
+        oppdatertSpillejobb.kjøring = kjøring
+        oppdatertSpillejobb.andreUtgifter = andreUtgifter
+        
+        // Oppdater spillejobben i binding
+        spillejobb = oppdatertSpillejobb
         
         // Oppdater spillejobben i band-objektet
         if let index = band.spillejobber.firstIndex(where: { $0.id == spillejobb.id }) {
-            band.spillejobber[index] = spillejobb
+            band.spillejobber[index] = oppdatertSpillejobb
         }
         
         dismiss()
@@ -133,7 +137,7 @@ struct RedigerSpillejobbView: View {
                         VStack(alignment: .leading) {
                             Text(kjøring[index].medlem.navn)
                                 .font(.headline)
-                            Text("\(kjøring[index].kilometer) km")
+                            Text("\(Int(kjøring[index].kilometer)) km")
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
                         }
@@ -167,17 +171,21 @@ struct RedigerSpillejobbView: View {
                     .foregroundColor(.gray)
             } else {
                 ForEach(andreUtgifter.indices, id: \.self) { index in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(andreUtgifter[index].beskrivelse)
-                                .font(.headline)
-                            Text(andreUtgifter[index].medlem.navn)
-                                .font(.subheadline)
+                    NavigationLink {
+                        RedigerUtgiftView(utgift: $andreUtgifter[index], band: band)
+                    } label: {
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(andreUtgifter[index].beskrivelse)
+                                    .font(.headline)
+                                Text(andreUtgifter[index].medlem.navn)
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                            }
+                            Spacer()
+                            Text("\(andreUtgifter[index].beløp, specifier: "%.2f") kr")
                                 .foregroundColor(.gray)
                         }
-                        Spacer()
-                        Text("\(andreUtgifter[index].beløp, specifier: "%.2f") kr")
-                            .foregroundColor(.gray)
                     }
                 }
                 .onDelete { indexSet in
@@ -236,11 +244,21 @@ struct RedigerSpillejobbView: View {
                 }
             }
         }
-        .customNavigationTitle("Rediger spillejobb")
+        .navigationTitle("Rediger spillejobb")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button("Ferdig") {
+                Button("Lagre") {
                     lagreEndringer()
+                }
+            }
+            
+            if focusedField != nil {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Ferdig") {
+                        focusedField = nil
+                    }
                 }
             }
         }
@@ -253,24 +271,17 @@ struct RedigerSpillejobbView: View {
         }
         .sheet(isPresented: $visLeggTilUtgift) {
             NavigationStack {
-                LeggTilUtgiftView(band: band) { utgift in
-                    andreUtgifter.append(utgift)
+                LeggTilUtgiftView(band: band) { nyUtgift in
+                    andreUtgifter.append(nyUtgift)
                 }
             }
         }
         .sheet(isPresented: $visFordelOverskudd) {
             NavigationStack {
-                FordelOverskuddView(spillejobb: spillejobb, band: band)
-            }
-        }
-        .toolbar {
-            if focusedField != nil {
-                ToolbarItemGroup(placement: .keyboard) {
-                    Spacer()
-                    Button("Ferdig") {
-                        focusedField = nil
-                    }
-                }
+                FordelOverskuddView(
+                    spillejobb: spillejobb,
+                    band: band
+                )
             }
         }
     }

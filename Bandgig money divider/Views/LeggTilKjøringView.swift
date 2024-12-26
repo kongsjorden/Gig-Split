@@ -8,6 +8,26 @@ struct LeggTilKjøringView: View {
     @State private var valgtMedlem: Medlem?
     @State private var kilometer = ""
     
+    private let numberFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 0
+        formatter.groupingSeparator = " "
+        formatter.groupingSize = 3
+        formatter.usesGroupingSeparator = true
+        return formatter
+    }()
+    
+    private func formatNumber(_ number: Double) -> String {
+        return numberFormatter.string(from: NSNumber(value: number)) ?? "0"
+    }
+    
+    private func parseNumber(_ text: String) -> Double? {
+        let cleanedText = text.replacingOccurrences(of: " ", with: "")
+        return Double(cleanedText)
+    }
+    
     var body: some View {
         Form {
             Section(header: Text("KJØREINFORMASJON")) {
@@ -20,6 +40,11 @@ struct LeggTilKjøringView: View {
                 
                 TextField("Antall kilometer", text: $kilometer)
                     .keyboardType(.numberPad)
+                    .onChange(of: kilometer) { oldValue, newValue in
+                        if let number = parseNumber(newValue) {
+                            kilometer = formatNumber(number)
+                        }
+                    }
             }
             
             if let medlem = valgtMedlem {
@@ -33,7 +58,11 @@ struct LeggTilKjøringView: View {
                     HStack {
                         Text("Totalt beløp")
                         Spacer()
-                        Text("\(Double(kilometer) ?? 0 * medlem.kjøregodtgjørelse, specifier: "%.2f") kr")
+                        if let antallKm = parseNumber(kilometer) {
+                            Text("\(antallKm * medlem.kjøregodtgjørelse, specifier: "%.2f") kr")
+                        } else {
+                            Text("0.00 kr")
+                        }
                     }
                 }
             }
@@ -49,7 +78,7 @@ struct LeggTilKjøringView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button("Lagre") {
                     if let medlem = valgtMedlem,
-                       let antallKm = Double(kilometer) {
+                       let antallKm = parseNumber(kilometer) {
                         let kjøring = KjøringDetalj(
                             medlem: medlem,
                             kilometer: antallKm
@@ -58,7 +87,7 @@ struct LeggTilKjøringView: View {
                         dismiss()
                     }
                 }
-                .disabled(valgtMedlem == nil || kilometer.isEmpty)
+                .disabled(valgtMedlem == nil || kilometer.isEmpty || parseNumber(kilometer) == nil)
             }
         }
     }

@@ -39,12 +39,12 @@ struct FordelOverskuddView: View {
                         HStack {
                             VStack(alignment: .leading) {
                                 Text(kjøring.medlem.navn)
-                                Text("\(kjøring.kilometer) km")
+                                Text("\(Int(kjøring.kilometer)) km")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
                             Spacer()
-                            Text("-\(Int(kjøring.beløp)) kr")
+                            Text("-\(kjøring.beløp, specifier: "%.2f") kr")
                                 .foregroundStyle(.red)
                         }
                         .padding(.leading)
@@ -54,7 +54,7 @@ struct FordelOverskuddView: View {
                         Text("Sum kjøring")
                             .fontWeight(.medium)
                         Spacer()
-                        Text("-\(Int(spillejobb.kjøringTotalt)) kr")
+                        Text("-\(spillejobb.kjøringTotalt.formatted()) kr")
                             .fontWeight(.medium)
                             .foregroundStyle(.red)
                     }
@@ -95,7 +95,7 @@ struct FordelOverskuddView: View {
                     Text("Totale utgifter")
                         .fontWeight(.bold)
                     Spacer()
-                    Text("-\(Int(spillejobb.totaleUtgifter)) kr")
+                    Text("-\(spillejobb.totaleUtgifter.formatted()) kr")
                         .fontWeight(.bold)
                         .foregroundStyle(.red)
                 }
@@ -106,7 +106,7 @@ struct FordelOverskuddView: View {
                 Text("Overskudd")
                     .fontWeight(.bold)
                 Spacer()
-                Text("\(Int(spillejobb.overskudd)) kr")
+                Text("\(spillejobb.overskudd.formatted()) kr")
                     .fontWeight(.bold)
                     .foregroundStyle(spillejobb.overskudd >= 0 ? .green : .red)
             }
@@ -122,7 +122,7 @@ struct FordelOverskuddView: View {
                 HStack {
                     Text(fordelt.medlem.navn)
                     Spacer()
-                    Text("\(Int(fordelt.beløp)) kr")
+                    Text("\(fordelt.beløp.formatted()) kr")
                         .foregroundStyle(fordelt.beløp >= 0 ? .green : .red)
                 }
             }
